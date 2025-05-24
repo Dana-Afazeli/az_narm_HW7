@@ -20,14 +20,36 @@ public class Memory {
         lastDataAddress = stratDataMemoryAddress;
     }
 
-    public int getTemp() {
+    public int peekTemp() {
+        return lastTempIndex;
+    }
+
+    public int peekDataAddress() {
+        return lastDataAddress;
+    }
+
+    public int getCurrentCodeBlockAddress() {
+        return codeBlock.size();
+    }
+
+    public void incrementTemp() {
         lastTempIndex += tempSize;
-        return lastTempIndex - tempSize;
+    }
+
+    public void incrementDataAddress() {
+        lastDataAddress += dataSize;
+    }
+
+    public int getTemp() {
+        int temp = peekTemp();
+        incrementTemp();
+        return temp;
     }
 
     public int getDateAddress() {
-        lastDataAddress += dataSize;
-        return lastDataAddress - dataSize;
+        int address = peekDataAddress();
+        incrementDataAddress();
+        return address;
     }
 
     public int saveMemory() {
@@ -42,10 +64,6 @@ public class Memory {
     public void add3AddressCode(int i, Operation op, Address opr1, Address opr2, Address opr3) {
         codeBlock.remove(i);
         codeBlock.add(i, new _3AddressCode(op, opr1, opr2, opr3));
-    }
-
-    public int getCurrentCodeBlockAddress() {
-        return codeBlock.size();
     }
 
     public void pintCodeBlock() {
@@ -74,14 +92,18 @@ class _3AddressCode {
     }
 
     public String toString() {
-        if (operation == null) return "";
+        if (operation == null)
+            return "";
         StringBuffer res = new StringBuffer("(");
         res.append(operation.toString()).append(",");
-        if (Operand1 != null) res.append(Operand1.toString());
+        if (Operand1 != null)
+            res.append(Operand1.toString());
         res.append(",");
-        if (Operand2 != null) res.append(Operand2.toString());
+        if (Operand2 != null)
+            res.append(Operand2.toString());
         res.append(",");
-        if (Operand3 != null) res.append(Operand3.toString());
+        if (Operand3 != null)
+            res.append(Operand3.toString());
         res.append(")");
 
         return res.toString();
