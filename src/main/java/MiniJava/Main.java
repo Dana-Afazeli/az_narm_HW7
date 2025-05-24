@@ -1,18 +1,19 @@
 package MiniJava;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 import MiniJava.errorHandler.ErrorHandler;
-import MiniJava.parser.Parser;
-
+import MiniJava.parser.ParserFacade;
 
 public class Main {
     public static void main(String[] args) {
-        Parser parser = new Parser();
+        ParserFacade parser = new ParserFacade();
         try {
-            // start parsing
-            parser.startParse(new Scanner(new File("src/main/resources/code")));
+            boolean success = parser.parseFile("src/main/resources/code");
+            if (!success) {
+                System.out.println("Parsing completed with errors.");
+            } else {
+                System.out.println("Parsing completed successfully.");
+            }
         } catch (FileNotFoundException e) {
             ErrorHandler.printError(e.getMessage());
         }

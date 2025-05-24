@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import MiniJava.Log.Log;
-import MiniJava.codeGenerator.CodeGenerator;
+import MiniJava.codeGenerator.CodeGeneratorFacade;
 import MiniJava.errorHandler.ErrorHandler;
 import MiniJava.scanner.lexicalAnalyzer;
 import MiniJava.scanner.token.Token;
@@ -17,7 +17,7 @@ public class Parser {
     private Stack<Integer> parsStack;
     private ParseTable parseTable;
     private lexicalAnalyzer lexicalAnalyzer;
-    private CodeGenerator cg;
+    private CodeGeneratorFacade codeGenerator;
 
     public Parser() {
         parsStack = new Stack<Integer>();
@@ -35,7 +35,7 @@ public class Parser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        cg = new CodeGenerator();
+        codeGenerator = new CodeGeneratorFacade();
     }
 
     public void startParse(java.util.Scanner sc) {
@@ -45,17 +45,14 @@ public class Parser {
         Action currentAction;
         while (!finish) {
             try {
-                Log.print(/*"lookahead : "+*/ lookAhead.toString() + "\t" + parsStack.peek());
-//                Log.print("state : "+ parsStack.peek());
+                Log.print(lookAhead.toString() + "\t" + parsStack.peek());
                 currentAction = parseTable.getActionTable(parsStack.peek(), lookAhead);
                 Log.print(currentAction.toString());
-                //Log.print("");
 
                 switch (currentAction.action) {
                     case shift:
                         parsStack.push(currentAction.number);
                         lookAhead = lexicalAnalyzer.getNextToken();
-
                         break;
                     case reduce:
                         Rule rule = rules.get(currentAction.number);
@@ -63,15 +60,12 @@ public class Parser {
                             parsStack.pop();
                         }
 
-                        Log.print(/*"state : " +*/ parsStack.peek() + "\t" + rule.LHS);
-//                        Log.print("LHS : "+rule.LHS);
+                        Log.print(parsStack.peek() + "\t" + rule.LHS);
                         parsStack.push(parseTable.getGotoTable(parsStack.peek(), rule.LHS));
-                        Log.print(/*"new State : " + */parsStack.peek() + "");
-//                        Log.print("");
-                        try {
-                            cg.semanticFunction(rule.semanticAction, lookAhead);
-                        } catch (Exception e) {
-                            Log.print("Code Genetator Error");
+                        Log.print(parsStack.peek() + "");
+
+                        if (!codeGenerator.generateCode(rule.semanticAction, lookAhead)) {
+                            Log.print("Code Generator Error");
                         }
                         break;
                     case accept:
@@ -79,25 +73,13 @@ public class Parser {
                         break;
                 }
                 Log.print("");
-            } catch (Exception ignored) {
-                ignored.printStackTrace();
-//                boolean find = false;
-//                for (NonTerminal t : NonTerminal.values()) {
-//                    if (parseTable.getGotoTable(parsStack.peek(), t) != -1) {
-//                        find = true;
-//                        parsStack.push(parseTable.getGotoTable(parsStack.peek(), t));
-//                        StringBuilder tokenFollow = new StringBuilder();
-//                        tokenFollow.append(String.format("|(?<%s>%s)", t.name(), t.pattern));
-//                        Matcher matcher = Pattern.compile(tokenFollow.substring(1)).matcher(lookAhead.toString());
-//                        while (!matcher.find()) {
-//                            lookAhead = lexicalAnalyzer.getNextToken();
-//                        }
-//                    }
-//                }
-//                if (!find)
-//                    parsStack.pop();
+            } catch (Exception e) {
+                ErrorHandler.printError("Parser Error");
+                finish = true;
             }
         }
-        if (!ErrorHandler.hasError) cg.printMemory();
+        if (!codeGenerator.hasErrors()) {
+            codeGenerator.printGeneratedCode();
+        }
     }
 }
