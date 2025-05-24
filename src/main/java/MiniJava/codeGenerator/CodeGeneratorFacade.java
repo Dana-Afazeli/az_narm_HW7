@@ -14,12 +14,11 @@ public class CodeGeneratorFacade {
 
     public boolean generateCode(int action, Token token) {
         try {
-            codeGenerator.semanticFunction(action, token);
-            hasErrors = ErrorHandler.hasError;
-            return !hasErrors;
+            codeGenerator.generateCode(action, token);
+            return true;
         } catch (Exception e) {
-            ErrorHandler.printError("Code generation error: " + e.getMessage());
             hasErrors = true;
+            ErrorHandler.printError("Code Generation Error: " + e.getMessage());
             return false;
         }
     }
@@ -34,6 +33,5 @@ public class CodeGeneratorFacade {
 
     public void reset() {
         hasErrors = false;
-        ErrorHandler.hasError = false;
     }
 }
