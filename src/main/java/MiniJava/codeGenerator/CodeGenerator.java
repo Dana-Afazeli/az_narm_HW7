@@ -1,7 +1,9 @@
 package MiniJava.codeGenerator;
 
 import MiniJava.Log.Log;
-import MiniJava.errorHandler.ErrorHandler;
+import MiniJava.errorHandler.CodeGenerationException;
+import MiniJava.errorHandler.MethodCallException;
+import MiniJava.errorHandler.TypeMismatchException;
 import MiniJava.scanner.token.Token;
 import MiniJava.semantic.symbol.Symbol;
 import MiniJava.semantic.symbol.SymbolTable;
@@ -36,7 +38,7 @@ public class CodeGenerator {
         CodeGenerationStrategy strategy = strategyFactory.getStrategy(func);
         if (strategy != null) {
             if (!strategy.execute(next)) {
-                ErrorHandler.printError("Code Generation Error");
+                throw new CodeGenerationException("Code Generation Error");
             }
         } else {
             handleLegacyOperation(func, next);
@@ -231,8 +233,9 @@ public class CodeGenerator {
         String className = callStack.pop();
         try {
             symbolTable.getNextParam(className, methodName);
-            ErrorHandler.printError("The few argument pass for method");
+            throw new MethodCallException("Too few arguments passed for method");
         } catch (IndexOutOfBoundsException e) {
+            // Expected behavior when all parameters are processed
         }
         varType t = varType.Int;
         switch (symbolTable.getMethodReturnType(className, methodName)) {
@@ -274,14 +277,14 @@ public class CodeGenerator {
             }
             Address param = ss.pop();
             if (param.varType != t) {
-                ErrorHandler.printError("The argument type isn't match");
+                throw new TypeMismatchException("The argument type doesn't match");
             }
             memory.add3AddressCode(Operation.ASSIGN, param, new Address(s.address, t), null);
 
             // symbolStack.push(className);
 
         } catch (IndexOutOfBoundsException e) {
-            ErrorHandler.printError("Too many arguments pass for method");
+            throw new MethodCallException("Too many arguments passed for method");
         }
         callStack.push(methodName);
 
@@ -291,7 +294,7 @@ public class CodeGenerator {
         Address s1 = ss.pop();
         Address s2 = ss.pop();
         if (s1.varType != s2.varType) {
-            ErrorHandler.printError("The type of operands in assign is different ");
+            throw new TypeMismatchException("The type of operands in assign is different");
         }
         memory.addAssignmentCode(s1, s2);
     }
@@ -300,7 +303,7 @@ public class CodeGenerator {
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != varType.Int || s2.varType != varType.Int) {
-            ErrorHandler.printError("In add two operands must be integer");
+            throw new TypeMismatchException("In add two operands must be integer");
         }
         memory.addArithmeticCode(Operation.ADD, s1, s2);
         ss.push(new Address(memory.peekTemp(), varType.Int));
@@ -310,7 +313,7 @@ public class CodeGenerator {
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != varType.Int || s2.varType != varType.Int) {
-            ErrorHandler.printError("In sub two operands must be integer");
+            throw new TypeMismatchException("In sub two operands must be integer");
         }
         memory.addArithmeticCode(Operation.SUB, s1, s2);
         ss.push(new Address(memory.peekTemp(), varType.Int));
@@ -320,7 +323,7 @@ public class CodeGenerator {
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != varType.Int || s2.varType != varType.Int) {
-            ErrorHandler.printError("In mult two operands must be integer");
+            throw new TypeMismatchException("In mult two operands must be integer");
         }
         memory.addArithmeticCode(Operation.MULT, s1, s2);
         ss.push(new Address(memory.peekTemp(), varType.Int));
@@ -358,7 +361,7 @@ public class CodeGenerator {
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != s2.varType) {
-            ErrorHandler.printError("The type of operands in equal operator is different");
+            throw new TypeMismatchException("The type of operands in equal operator is different");
         }
         memory.add3AddressCode(Operation.EQ, s1, s2, temp);
         ss.push(temp);
@@ -369,7 +372,7 @@ public class CodeGenerator {
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != varType.Int || s2.varType != varType.Int) {
-            ErrorHandler.printError("The type of operands in less than operator is different");
+            throw new TypeMismatchException("The type of operands in less than operator is different");
         }
         memory.add3AddressCode(Operation.LT, s1, s2, temp);
         ss.push(temp);
@@ -380,7 +383,7 @@ public class CodeGenerator {
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != varType.Bool || s2.varType != varType.Bool) {
-            ErrorHandler.printError("In and operator the operands must be boolean");
+            throw new TypeMismatchException("In and operator the operands must be boolean");
         }
         memory.add3AddressCode(Operation.AND, s1, s2, temp);
         ss.push(temp);
@@ -391,7 +394,7 @@ public class CodeGenerator {
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != varType.Bool) {
-            ErrorHandler.printError("In not operator the operand must be boolean");
+            throw new TypeMismatchException("In not operator the operand must be boolean");
         }
         memory.add3AddressCode(Operation.NOT, s1, s2, temp);
         ss.push(temp);
@@ -454,7 +457,7 @@ public class CodeGenerator {
                 temp = varType.Bool;
         }
         if (s.varType != temp) {
-            ErrorHandler.printError("The type of method and return address was not match");
+            throw new TypeMismatchException("The type of method and return address was not match");
         }
         memory.add3AddressCode(Operation.ASSIGN, s,
                 new Address(symbolTable.getMethodReturnAddress(symbolStack.peek(), methodName), varType.Address,
