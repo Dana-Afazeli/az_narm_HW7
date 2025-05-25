@@ -11,8 +11,7 @@ import MiniJava.semantic.symbol.SymbolTable;
 import java.util.Stack;
 
 public class AddStrategy extends BaseCodeGenerationStrategy {
-    public AddStrategy(Memory memory, SymbolTable symbolTable,
-            Stack<Address> ss, Stack<String> symbolStack,
+    public AddStrategy(Memory memory, SymbolTable symbolTable, Stack<Address> ss, Stack<String> symbolStack,
             Stack<String> callStack) {
         super(memory, symbolTable, ss, symbolStack, callStack);
     }

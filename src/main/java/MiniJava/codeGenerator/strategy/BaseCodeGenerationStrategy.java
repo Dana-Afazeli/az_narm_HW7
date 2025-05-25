@@ -17,9 +17,8 @@ public abstract class BaseCodeGenerationStrategy implements CodeGenerationStrate
     protected final Stack<String> symbolStack;
     protected final Stack<String> callStack;
 
-    public BaseCodeGenerationStrategy(Memory memory, SymbolTable symbolTable,
-            Stack<Address> ss, Stack<String> symbolStack,
-            Stack<String> callStack) {
+    public BaseCodeGenerationStrategy(Memory memory, SymbolTable symbolTable, Stack<Address> ss,
+            Stack<String> symbolStack, Stack<String> callStack) {
         this.memory = memory;
         this.symbolTable = symbolTable;
         this.ss = ss;

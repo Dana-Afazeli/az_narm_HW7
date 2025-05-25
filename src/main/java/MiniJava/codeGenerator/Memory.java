@@ -200,14 +200,18 @@ class _3AddressCode {
     }
 
     public String toString() {
-        if (getOperation() == null) return "";
+        if (getOperation() == null)
+            return "";
         StringBuffer res = new StringBuffer("(");
         res.append(getOperation().toString()).append(",");
-        if (getOperand1() != null) res.append(getOperand1().toString());
+        if (getOperand1() != null)
+            res.append(getOperand1().toString());
         res.append(",");
-        if (getOperand2() != null) res.append(getOperand2().toString());
+        if (getOperand2() != null)
+            res.append(getOperand2().toString());
         res.append(",");
-        if (getOperand3() != null) res.append(getOperand3().toString());
+        if (getOperand3() != null)
+            res.append(getOperand3().toString());
         res.append(")");
         return res.toString();
     }

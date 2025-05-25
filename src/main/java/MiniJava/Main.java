@@ -1,4 +1,5 @@
 package MiniJava;
+
 import java.io.FileNotFoundException;
 
 import MiniJava.errorHandler.ErrorHandler;
