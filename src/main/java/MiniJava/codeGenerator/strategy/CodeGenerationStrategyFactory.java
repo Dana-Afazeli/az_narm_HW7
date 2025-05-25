@@ -16,9 +16,8 @@ public class CodeGenerationStrategyFactory {
     private final Stack<String> symbolStack;
     private final Stack<String> callStack;
 
-    public CodeGenerationStrategyFactory(Memory memory, SymbolTable symbolTable,
-            Stack<Address> ss, Stack<String> symbolStack,
-            Stack<String> callStack) {
+    public CodeGenerationStrategyFactory(Memory memory, SymbolTable symbolTable, Stack<Address> ss,
+            Stack<String> symbolStack, Stack<String> callStack) {
         this.memory = memory;
         this.symbolTable = symbolTable;
         this.ss = ss;
