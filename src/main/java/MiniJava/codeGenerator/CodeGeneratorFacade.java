@@ -1,6 +1,6 @@
 package MiniJava.codeGenerator;
 
-import MiniJava.errorHandler.ErrorHandler;
+import MiniJava.errorHandler.CodeGenerationException;
 import MiniJava.scanner.token.Token;
 
 public class CodeGeneratorFacade {
@@ -16,9 +16,9 @@ public class CodeGeneratorFacade {
         try {
             codeGenerator.generateCode(action, token);
             return true;
-        } catch (Exception e) {
+        } catch (CodeGenerationException e) {
             hasErrors = true;
-            ErrorHandler.printError("Code Generation Error: " + e.getMessage());
+            System.err.println("Code Generation Error: " + e.getMessage());
             return false;
         }
     }
