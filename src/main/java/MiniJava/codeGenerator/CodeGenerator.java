@@ -290,50 +290,40 @@ public class CodeGenerator {
     public void assign() {
         Address s1 = ss.pop();
         Address s2 = ss.pop();
-        // try {
         if (s1.varType != s2.varType) {
             ErrorHandler.printError("The type of operands in assign is different ");
         }
-        // }catch (NullPointerException d)
-        // {
-        // d.printStackTrace();
-        // }
-        memory.add3AddressCode(Operation.ASSIGN, s1, s2, null);
+        memory.addAssignmentCode(s1, s2);
     }
 
     public void add() {
-        Address temp = new Address(memory.getTemp(), varType.Int);
         Address s2 = ss.pop();
         Address s1 = ss.pop();
-
         if (s1.varType != varType.Int || s2.varType != varType.Int) {
             ErrorHandler.printError("In add two operands must be integer");
         }
-        memory.add3AddressCode(Operation.ADD, s1, s2, temp);
-        ss.push(temp);
+        memory.addArithmeticCode(Operation.ADD, s1, s2);
+        ss.push(new Address(memory.peekTemp(), varType.Int));
     }
 
     public void sub() {
-        Address temp = new Address(memory.getTemp(), varType.Int);
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != varType.Int || s2.varType != varType.Int) {
             ErrorHandler.printError("In sub two operands must be integer");
         }
-        memory.add3AddressCode(Operation.SUB, s1, s2, temp);
-        ss.push(temp);
+        memory.addArithmeticCode(Operation.SUB, s1, s2);
+        ss.push(new Address(memory.peekTemp(), varType.Int));
     }
 
     public void mult() {
-        Address temp = new Address(memory.getTemp(), varType.Int);
         Address s2 = ss.pop();
         Address s1 = ss.pop();
         if (s1.varType != varType.Int || s2.varType != varType.Int) {
             ErrorHandler.printError("In mult two operands must be integer");
         }
-        memory.add3AddressCode(Operation.MULT, s1, s2, temp);
-        // memory.saveMemory();
-        ss.push(temp);
+        memory.addArithmeticCode(Operation.MULT, s1, s2);
+        ss.push(new Address(memory.peekTemp(), varType.Int));
     }
 
     public void label() {
@@ -345,25 +335,22 @@ public class CodeGenerator {
     }
 
     public void _while() {
-        memory.add3AddressCode(ss.pop().num, Operation.JPF, ss.pop(),
-                new Address(memory.getCurrentCodeBlockAddress() + 1, varType.Address), null);
-        memory.add3AddressCode(Operation.JP, ss.pop(), null, null);
+        memory.addConditionalJumpCode(ss.pop(), ss.pop());
+        memory.addJumpCode(ss.pop());
     }
 
     public void jpf_save() {
         Address save = new Address(memory.saveMemory(), varType.Address);
-        memory.add3AddressCode(ss.pop().num, Operation.JPF, ss.pop(),
-                new Address(memory.getCurrentCodeBlockAddress(), varType.Address), null);
+        memory.addConditionalJumpCode(ss.pop(), new Address(memory.getCurrentCodeBlockAddress(), varType.Address));
         ss.push(save);
     }
 
     public void jpHere() {
-        memory.add3AddressCode(ss.pop().num, Operation.JP,
-                new Address(memory.getCurrentCodeBlockAddress(), varType.Address), null, null);
+        memory.addJumpCode(new Address(memory.getCurrentCodeBlockAddress(), varType.Address));
     }
 
     public void print() {
-        memory.add3AddressCode(Operation.PRINT, ss.pop(), null, null);
+        memory.addPrintCode(ss.pop());
     }
 
     public void equal() {

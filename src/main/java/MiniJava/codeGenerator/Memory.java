@@ -106,6 +106,43 @@ public class Memory {
         getCodeBlock().add(i, new _3AddressCode(op, opr1, opr2, opr3));
     }
 
+    public void addAssignmentCode(Address source, Address destination) {
+        add3AddressCode(Operation.ASSIGN, source, destination, null);
+    }
+
+    public void addJumpCode(Address target) {
+        add3AddressCode(Operation.JP, target, null, null);
+    }
+
+    public void addConditionalJumpCode(Address condition, Address target) {
+        add3AddressCode(Operation.JPF, condition, target, null);
+    }
+
+    public void addPrintCode(Address value) {
+        add3AddressCode(Operation.PRINT, value, null, null);
+    }
+
+    public void addArithmeticCode(Operation op, Address operand1, Address operand2) {
+        Address temp = new Address(getTemp(), getVarTypeForOperation(op));
+        add3AddressCode(op, operand1, operand2, temp);
+    }
+
+    private varType getVarTypeForOperation(Operation op) {
+        switch (op) {
+            case ADD:
+            case SUB:
+            case MULT:
+                return varType.Int;
+            case AND:
+            case NOT:
+            case EQ:
+            case LT:
+                return varType.Bool;
+            default:
+                return varType.Int;
+        }
+    }
+
     public void pintCodeBlock() {
         System.out.println("Code Block");
         for (int i = 0; i < getCodeBlock().size(); i++) {
