@@ -1,34 +1,115 @@
-# MiniJava
-Mini-Java is a subset of Java. MiniJava compiler implement a compiler for the Mini-java
-programming language.
+# آزمایش هفتم: بازآرایی کد
+**اعضا**: دانا افاضلی: ۹۸۱۰۵۵۹۲ - محمدامین کرمی: ۹۸۱۰۵۹۹۸
 
-# Rules of MiniJava
-```
-Goal --> Source EOF
-Source --> ClassDeclarations MainClass
-MainClass --> class Identifier { public static void main() { VarDeclarations Statements}}
-ClassDeclarations --> ClassDeclaration ClassDeclarations | lambda
-ClassDeclaration --> class Identifier Extension { FieldDeclarations MethodDeclarations }
-Extension --> extends Identifier | lambda
-FieldDeclarations --> FieldDeclaration FieldDeclarations | lambda
-FieldDeclaration --> static Type Identifier ;
-VarDeclarations --> VarDeclaration VarDeclarations | lambda
-VarDeclaration --> Type Identifier ;
-MethodDeclarations --> MethodDeclaration MethodDeclarations | lambda
-MethodDeclaration --> public static Type Identifier ( Parameters ) { VarDeclarations Statements return GenExpression ; }
-Parameters --> Type Identifier Parameter | lambda
-Parameter --> , Type Identifier Parameter | lambda
-Type --> boolean | int
-Statements --> Statements Statement | lambda
-Statement --> { Statements } | if ( GenExpression ) Statement else Statement | while ( GenExpression ) Statement | System.out.println ( GenExpression ) ; | Identifier = GenExpression ;
-GenExpression --> Expression | RelExpression
-Expression --> Expression + Term | Expression - Term | Term
-Term --> Term * Factor | Factor
-Factor --> ( Expression ) | Identifier | Identifier . Identifier | Identifier . Identifier ( Arguments ) | true | false | Integer
-RelExpression --> RelExpression && RelTerm | RelTerm
-RelTerm --> Expression == Expression | Expression < Expression
-Arguments --> GenExpression Argument | lambda
-Argument --> , GenExpression Argument | lambda
-Identifier --> <IDENTIFIER_LITERAL>
-Integer --> <INTEGER_LITERAL>
-```
+
+## ۱. هر یک از مفاهیم زیر را در حد یک خط توضیح دهید.
+
+- **کد تمیز:**  
+  کدی که خوانا، قابل فهم و نگهداری باشد و ساختار شفاف و نام‌گذاری معنادار داشته باشد.
+
+- **بدهی فنی:**  
+  هزینه‌ای که به دلیل راه‌حل‌های سریع و غیراصولی در کد جمع می‌شود و نیازمند بازآرایی یا بهبود در آینده است.
+
+- **بوی بد کد:**  
+  نشانه یا علامتی در کد که وجود مشکل عمیق‌تر یا نیاز به بازآرایی را مطرح می‌کند.
+
+---
+
+## ۲. دسته‌بندی پنجگانه بوهای بد کد (بر اساس Refactoring.Guru) و توضیح مختصر:
+
+۱. **حجم‌دهنده‌ها (Bloaters):**  
+اجزای بزرگ و بیش از حد رشد یافته مانند کلاس‌ها یا متدهای طولانی و لیست‌های پارامتر زیاد که فهم و تغییر کد را دشوار می‌کنند.
+
+۲. **سوءاستفاده‌کنندگان شی‌گرایی (Object-Orientation Abusers):**  
+استفاده نامناسب از اصول شی‌گرایی مانند عدم استفاده درست از کپسوله‌سازی، وراثت یا چندریختی (مثلاً استفاده از شرط روی نوع یا خودداری از چندریختی).
+
+۳. **مانع‌های تغییر (Change Preventers):**  
+تصمیم‌های طراحی که تغییر کد را دشوار می‌کنند، مثل جراحی ساچمه‌ای (تغییرات متعدد برای یک کار) یا تغییر واگرا (تغییر یک کلاس برای دلایل متفاوت).
+
+۴. **اضافه‌ها (Dispensables):**  
+کدهای غیرضروری یا زائد مثل کد مرده، کد تکراری یا کلاس‌های بدون انتزاع معنی‌دار.
+
+۵. **وابسته‌ها (Couplers):**  
+کدهایی که وابستگی زیاد به بخش‌های دیگر دارند و تغییر آن‌ها را پرریسک می‌کند، مثل نزدیکی نامناسب بین کلاس‌ها یا حسادت ویژگی (Feature Envy).
+
+---
+
+## ۳. درباره "Feature Envy" (یکی از انواع بوی بد کد):
+
+- **در کدام دسته قرار می‌گیرد؟**  
+  وابسته‌ها (Couplers)، چون بیانگر کدی است که بیش از حد به داده‌ها یا متدهای یک کلاس دیگر علاقه دارد.
+
+- **چه بازآرایی برای رفع آن توصیه می‌شود؟**  
+  معمولاً بازآرایی "انتقال متد" (Move Method) یا گاهی "استخراج متد" و سپس انتقال آن به کلاس مربوط.
+
+- **چه زمانی می‌توان آن را نادیده گرفت؟**  
+  اگر انتقال متد باعث کاهش وضوح و خوانایی کد شود (مثلاً وقتی متد باید با داده‌های چند کلاس کار کند و انتقالش باعث کاهش انسجام می‌شود)، می‌توان آن را به همان حالت باقی گذاشت.
+
+---
+
+## ۴. دو تفاوت بین “Bug” و “Code Smell”:
+
+۱. **باگ:** خطایی که باعث رفتار اشتباه یا ناخواسته برنامه می‌شود.  
+**بوی بد کد:** مشکلی ساختاری در کد که الزاماً باعث باگ نمی‌شود اما نشانه‌ی نیاز به بهبود یا بازآرایی است.
+
+۲. **باگ:** باید اصلاح شود تا اجرای صحیح برنامه تضمین گردد.  
+**بوی بد کد:** نشانه‌ای برای بهبود طراحی یا نگهداری است اما الزاماً برای صحت برنامه ضروری نیست.
+
+پلاگین formatter چیست و چه می‌کند؟ چرا می‌تواند کمک‌کننده باشد و رابطه آن با بازآرایی کد چیست؟
+پلاگین formatter (مانند formatter-maven-plugin) ابزاری است که به طور خودکار فرمت و قالب‌بندی کد را بر اساس استانداردهای مشخص (مثل فاصله‌گذاری، تورفتگی، چیدمان براکت‌ها و غیره) یکسان و هماهنگ می‌کند. این پلاگین با استفاده از یک فایل تنظیمات، تمامی فایل‌های کد منبع پروژه را بررسی و مطابق با سبک انتخابی فرمت می‌کند، بدون اینکه منطق یا عملکرد کد را تغییر دهد.
+
+---
+## ۵. بوی بد در پروژه مدل به C
+
+بر اساس تحلیل کد پروژه، ده مورد از بوهای بد کد (Code Smell) طبق لیست Refactoring.Guru به شرح زیر قابل شناسایی هستند:
+
+۱. کلاس بزرگ (Large Class)
+فایل ClassStructure.java یک کلاس بزرگ با مسئولیت‌های متعدد است. این کلاس هم ساختار کلاس را مدیریت می‌کند، هم تولید سند XML، هم بررسی وضعیت و هم تغییر داده‌ها را انجام می‌دهد. این مسئله با اصل مسئولیت واحد (SRP) در تضاد است.
+
+۲. متد طولانی (Long Method)
+متد setDataByNode در ClassStructure.java بسیار طولانی است و چندین مسئولیت مانند تجزیه انواع مختلف نودها (name، super، destructor، constructors و ...) را به عهده دارد.
+
+۳. شیفتگی به نوع‌های ابتدایی (Primitive Obsession)
+در کد، نوع‌های اولیه (مانند String و boolean) برای بیان مفاهیم پیچیده استفاده شده است. مثلاً در ClassInfo.java، برای مشخص‌کردن وجود سازنده یا مخرب از بولین‌های ساده به جای شیء مناسب استفاده شده است.
+
+۴. توده‌های داده (Data Clumps)
+در کلاس‌های ClassMethod و ClassConstructor، گروه‌هایی از پارامترها و نوع‌های بازگشتی چندین بار تکرار شده‌اند که بهتر است در یک کلاس جداگانه جمع شوند.
+
+۵. دستور Switch (Switch Statements)
+در ClassStructure.java، یک دستور switch بزرگ در متد setDataByNode وجود دارد که می‌تواند با استفاده از چندریختی یا رویکرد شی‌گرا جایگزین شود.
+
+۶. فیلد موقتی (Temporary Field)
+در فایل Phase2CodeFileManipulator.java، فیلدهای موقتی زیادی مانند firstClassCalled، lastClassCalled، numberOfClassCalled وجود دارند که صرفاً برای پیگیری وضعیت حین دستکاری فایل‌ها استفاده می‌شوند.
+
+۷. ارث‌بری نامناسب (Refused Bequest)
+ساختار ارث‌بری در پروژه نشانه‌هایی از "ارث‌بری نامناسب" دارد؛ جایی که زیرکلاس‌ها از همه متدها و ویژگی‌های کلاس والد خود استفاده نمی‌کنند. مثلاً CompleteMethod از ClassMethod ارث‌بری می‌کند ولی بسیاری از رفتارهای آن را بازنویسی می‌کند.
+
+۸. کلاس‌های جایگزین با واسط‌های متفاوت (Alternative Classes with Different Interfaces)
+کلاس‌های متعددی مانند ClassMethod، ClassConstructor و ClassAttribute عملکرد مشابهی دارند اما واسط‌های متفاوتی ارائه می‌دهند که استفاده سازگار از آن‌ها را دشوار می‌کند.
+
+۹. صمیمیت نامناسب (Inappropriate Intimacy)
+وابستگی شدید بین کلاس‌ها، به ویژه در فاز تولید کد، مشهود است. مثلاً CompleteMethod اطلاعات زیادی درباره جزئیات داخلی MethodOverloader دارد.
+
+۱۰. واسط غیرضروری (Middle Man)
+کلاس DiagramInfo عمدتاً به عنوان یک واسط بین سایر کلاس‌ها عمل می‌کند و بیشتر کارهای خود را به اشیاء ClassInfo واگذار می‌کند بدون اینکه ارزش افزوده‌ای ارائه دهد.
+
+این بوهای بد نشان‌دهنده بخش‌هایی از کد هستند که می‌توان آن‌ها را جهت بهبود نگهداری، خوانایی و گسترش‌پذیری کد اصلاح و بازآرایی کرد. (همان‌طور که خواسته بودید، صرفاً به شناسایی بوها پرداخته شده و راه‌حل بازآرایی ارائه نشده است.)
+
+---
+## ۶.  کمک‌کننده بودن پلاگین formatter برای بازآرایی کد: 
+
+افزایش خوانایی و یکدستی: پس از بازآرایی، سبک کد ممکن است در قسمت‌های مختلف ناهماهنگ شود. اجرای پلاگین formatter، کد را یکدست، خوانا و قابل‌فهم نگه می‌دارد و باعث می‌شود تغییرات ناشی از بازآرایی واضح‌تر دیده شوند.
+
+کاهش خطاهای انسانی: قالب‌بندی دستی می‌تواند باعث خطا یا سبک‌های ناسازگار شود. پلاگین این مشکلات را رفع می‌کند.
+
+تمرکز بر منطق به جای ظاهر: توسعه‌دهندگان می‌توانند روی بهبود ساختار (بازآرایی) و منطق برنامه تمرکز کنند و نگران قالب‌بندی نباشند، چون این کار خودکار انجام می‌شود.
+
+رابطه پلاگین formatter با بازآرایی کد:
+
+تکمیل‌کننده فرایند بازآرایی: بازآرایی کد مربوط به بهبود ساختار داخلی و طراحی است و هدفش نگهداری و گسترش آسان‌تر کد است. پلاگین formatter این فرایند را تکمیل می‌کند و تضمین می‌کند که بعد از هر بازآرایی، ظاهر و فرمت کد منظم و یکنواخت باقی بماند.
+
+پرهیز از اختلافات بی‌دلیل در ورژن کنترل: با استفاده از formatter، تغییرات مربوط به فرمت که ربطی به منطق کد ندارند، از تغییرات ساختاری جدا می‌شوند و مدیریت پروژه و همکاری تیمی آسان‌تر می‌شود.
+
+خلاصه:
+پلاگین formatter ابزاری برای یکنواخت‌سازی ظاهر کد است و باعث می‌شود نتیجه‌ی بازآرایی‌ها قابل‌خواندن‌تر، شفاف‌تر و حرفه‌ای‌تر باشد. اگرچه بازآرایی ساختار را تغییر می‌دهد، formatter ظاهر را منسجم نگه می‌دارد.
+
